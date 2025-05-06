@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Feliz Dia das Mães 💐</title>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #fff7f2;
+      color: #4b2e2e;
+      padding: 20px;
+      line-height: 1.6;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 40px;
+    }
+
+    h1 {
+      font-size: 2.5rem;
+      color: #d1495b;
+    }
+
+    h2 {
+      font-size: 1.8rem;
+      margin-bottom: 10px;
+      color: #a23e48;
+    }
+
+    section {
+      margin-bottom: 40px;
+    }
+
+    footer {
+      text-align: center;
+      font-size: 0.9rem;
+      color: #888;
+    }
+
+    .quiz {
+      background-color: #ffe4e1;
+      padding: 20px;
+      border-radius: 10px;
+    }
+
+    .quiz button {
+      margin-top: 10px;
+      padding: 10px;
+      border: none;
+      background-color: #f28c8c;
+      color: white;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    canvas {
+      border: 2px solid #d1495b;
+      display: block;
+      margin: 20px auto;
+    }
+
+    .message {
+      text-align: center;
+      font-size: 1.5rem;
+      margin-top: 20px;
+    }
+
+    .memory-game {
+      display: grid;
+      grid-template-columns: repeat(5, 60px);
+      gap: 10px;
+      justify-content: center;
+      margin-top: 20px;
+    }
+
+    .memory-card {
+      width: 60px;
+      height: 60px;
+      background-color: #f9c6c6;
+      border: 2px solid #d1495b;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      cursor: pointer;
+    }
+
+    .matched {
+      background-color: #b3e6b3;
+      pointer-events: none;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Feliz Dia das Mães! 💖</h1>
+    <p>Um site feito com muito amor!</p>
+  </header>
+
+  <main>
+    <section id="homenagem">
+      <h2>Homenagem</h2>
+      <p>“Mãe, seu amor é o que me guia todos os dias. Obrigado por tudo!”</p>
+    </section>
+
+    <section id="quiz" class="quiz">
+      <h2>Quiz: Quanto você conhece sua mãe?</h2>
+      <p id="quiz-question">Qual a flor favorita da sua mãe?</p>
+      <button onclick="answer('Rosas')">Rosas</button>
+      <button onclick="answer('Girassol')">Girassol</button>
+      <button onclick="answer('Tulipas')">Tulipas</button>
+      <p id="quiz-result"></p>
+    </section>
+
+    <section id="arte">
+      <h2>Desenhe algo para sua mãe</h2>
+      <canvas id="drawingCanvas" width="300" height="300"></canvas>
+      <p style="text-align:center;">
+        <button onclick="clearCanvas()">Limpar desenho</button>
+      </p>
+    </section>
+
+    <section id="jogo-da-memoria">
+      <h2>Jogo da Memória</h2>
+      <div class="memory-game" id="memory-game"></div>
+    </section>
+
+    <section id="mensagem-final">
+      <h2>Mensagem Final</h2>
+      <p class="message" id="typed-message"></p>
+    </section>
+  </main>
+
+  <footer>
+    <p>&copy; 2025 - Com carinho 💐</p>
+  </footer>
+
+  <script>
+    // Quiz interativo
+    function answer(resposta) {
+      const result = document.getElementById('quiz-result');
+      result.textContent = `Você escolheu: ${resposta}! Sua mãe vai amar! 💕`;
+    }
+
+    // Canvas de desenho
+    const canvas = document.getElementById('drawingCanvas');
+    const ctx = canvas.getContext('2d');
+    let desenhando = false;
+
+    canvas.addEventListener('mousedown', () => { desenhando = true; });
+    canvas.addEventListener('mouseup', () => { desenhando = false; ctx.beginPath(); });
+    canvas.addEventListener('mousemove', desenhar);
+
+    function desenhar(event) {
+      if (!desenhando) return;
+      ctx.lineWidth = 2;
+      ctx.lineCap = 'round';
+      ctx.strokeStyle = '#d1495b';
+      ctx.lineTo(event.offsetX, event.offsetY);
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(event.offsetX, event.offsetY);
+    }
+
+    function clearCanvas() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+    }
+
+    // Mensagem final com efeito de digitação
+    const message = "Você é incrível, mãe! Te amamos muito 💗";
+    let index = 0;
+
+    function typeMessage() {
+      if (index < message.length) {
+        document.getElementById("typed-message").textContent += message.charAt(index);
+        index++;
+        setTimeout(typeMessage, 100);
+      }
+    }
+    window.onload = () => {
+      typeMessage();
+      iniciarJogoMemoria();
+    };
+
+    // Jogo da Memória
+    function iniciarJogoMemoria() {
+      const emojis = ['🌷','🌸','💐','🌼','🌻','🌹','🌺','🥰','💕','👩'];
+      const pares = [...emojis, ...emojis]; // 20 peças
+      const embaralhado = pares.sort(() => 0.5 - Math.random());
+      const jogo = document.getElementById('memory-game');
+      let selecionadas = [];
+
+      embaralhado.forEach((emoji, index) => {
+        const carta = document.createElement('div');
+        carta.classList.add('memory-card');
+        carta.dataset.emoji = emoji;
+        carta.dataset.index = index;
+        carta.addEventListener('click', () => virarCarta(carta));
+        jogo.appendChild(carta);
+      });
+
+      function virarCarta(carta) {
+        if (carta.textContent || carta.classList.contains('matched')) return;
+
+        carta.textContent = carta.dataset.emoji;
+        selecionadas.push(carta);
+
+        if (selecionadas.length === 2) {
+          const [c1, c2] = selecionadas;
+          if (c1.dataset.emoji === c2.dataset.emoji && c1.dataset.index !== c2.dataset.index) {
+            c1.classList.add('matched');
+            c2.classList.add('matched');
+            selecionadas = [];
+          } else {
+            setTimeout(() => {
+              c1.textContent = '';
+              c2.textContent = '';
+              selecionadas = [];
+            }, 1000);
+          }
+        }
+      }
+    }
+  </script>
+</body>
+</html>
